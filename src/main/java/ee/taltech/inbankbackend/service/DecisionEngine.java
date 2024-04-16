@@ -42,7 +42,7 @@ public class DecisionEngine {
         try {
             verifyInputs(personalCode, loanAmount, loanPeriod);
             if (!ageChecker(personalCode)) {
-                throw new NoValidLoanException("You're age isn't suitable");
+                throw new NoValidLoanException("You're age isn't suitable.");
             }
         } catch (Exception e) {
             return new Decision(null, null, e.getMessage());
