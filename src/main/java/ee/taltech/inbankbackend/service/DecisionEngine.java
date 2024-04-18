@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.Period;
-import java.time.format.DateTimeFormatter;
+
 
 /**
  * A service class that provides a method for calculating an approved loan amount and period for a customer.
@@ -34,14 +34,16 @@ public class DecisionEngine {
      * @throws InvalidPersonalCodeException If the provided personal ID code is invalid
      * @throws InvalidLoanAmountException If the requested loan amount is invalid
      * @throws InvalidLoanPeriodException If the requested loan period is invalid
-     * @throws NoValidLoanException If there is no valid loan found for the given ID code, loan amount and loan period
+     * @throws NoValidLoanException If there is no valid loan found for the given ID code, loan amount,
+     * loan period and loan age (under 18 and over 75)
      */
     public Decision calculateApprovedLoan(String personalCode, Long loanAmount, int loanPeriod)
             throws InvalidPersonalCodeException, InvalidLoanAmountException, InvalidLoanPeriodException,
             NoValidLoanException {
         try {
             verifyInputs(personalCode, loanAmount, loanPeriod);
-            if (!ageChecker(personalCode)) {
+            //Check the client's age and throw out an exception if they are too young or too old
+            if (!checkAge(personalCode)) {
                 throw new NoValidLoanException("You're age isn't suitable.");
             }
         } catch (Exception e) {
@@ -129,9 +131,12 @@ public class DecisionEngine {
 
     }
 
-    private boolean ageChecker(String personalCode) {
+    /**
+     * verification of client's age, more detailed information in file SOLUTION.md
+     */
+    private boolean checkAge(String personalCode) {
         String birthDateString = personalCode.substring(1, 7);
-        int year = Integer.parseInt(birthDateString.substring(0, 2)); // Extracting year
+        int year = Integer.parseInt(birthDateString.substring(0, 2));
         int month = Integer.parseInt(birthDateString.substring(2, 4));
         int day = Integer.parseInt(birthDateString.substring(4, 6));
         if (year >= 22) {
